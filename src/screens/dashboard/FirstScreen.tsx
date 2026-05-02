@@ -1,4 +1,4 @@
-import { Canvas, Circle, Paint, rect, vec } from "@shopify/react-native-skia";
+import { Canvas, Group, Oval, rect, vec } from "@shopify/react-native-skia";
 import React from "react";
 import { StyleSheet, useWindowDimensions } from "react-native";
 const FirstScreen = () => {
@@ -23,39 +23,35 @@ const FirstScreen = () => {
   return (
     <Canvas style={styles.canvas}>
       {/* Oval 1 — horizontal (0°) */}
-      {/* <Oval
+      <Oval
         rect={ovalRect}
-        color={color}
+        color="00CFFF"
         style="stroke"
         strokeWidth={strokeWidth}
       />
       {/* Oval 2 — rotated 60° */}
-      {/* <Group transform={[{ rotate: Math.PI / 3 }]} origin={{ x: cx, y: cy }}>
+      <Group transform={[{ rotate: Math.PI / 3 }]} origin={{ x: cx, y: cy }}>
         <Oval
           rect={ovalRect}
-          color={color}
+          color="00CFFF"
           style="stroke"
           strokeWidth={strokeWidth}
         />
-      </Group> */}
+      </Group>
 
       {/* Oval 3 — rotated 120° */}
-      {/* <Group
+      <Group
         transform={[{ rotate: (2 * Math.PI) / 3 }]}
         origin={{ x: cx, y: cy }}
       >
         <Oval
           rect={ovalRect}
-          color={color}
+          color={"lightblue"}
           style="stroke"
           strokeWidth={strokeWidth}
-        /> */}
-      {/* </Group> */}
+        />
+      </Group>
       {/* Center dot */}
-      <Circle cx={200} cy={400} r={140}>
-        <Paint color="lightblue" />
-        <Paint color="navy" style="stroke" strokeWidth={20} />
-      </Circle>
     </Canvas>
   );
 };
