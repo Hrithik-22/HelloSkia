@@ -1,66 +1,94 @@
-import { Canvas, Group, Oval, rect, vec } from "@shopify/react-native-skia";
-import React from "react";
+import {
+  BlurMask,
+  Canvas,
+  Circle,
+  Group,
+  Oval,
+  Paint,
+  RadialGradient,
+  rect,
+  SweepGradient,
+  vec,
+} from "@shopify/react-native-skia";
+import { useEffect } from "react";
 import { StyleSheet, useWindowDimensions } from "react-native";
+import {
+  Easing,
+  useDerivedValue,
+  useSharedValue,
+  withRepeat,
+  withTiming,
+} from "react-native-reanimated";
+
 const FirstScreen = () => {
   const { width, height } = useWindowDimensions();
+  const center = vec(width / 2, height / 2);
+  const c1 = "#00CFFF";
+  const c2 = "#1A6EF5";
+  const rct = rect(center.x - 130, center.y - 50, 260, 100);
 
-  const cx = width / 2;
-  const cy = height / 2;
+  // 🌀 The spin value
+  const rotate = useSharedValue(0);
+  const rotateTransform = useDerivedValue(() => [{ rotate: rotate.value }]);
 
-  // The oval dimensions
-  const ovalW = 260;
-  const ovalH = 100;
+  useEffect(() => {
+    rotate.value = withRepeat(
+      withTiming(Math.PI * 2, {
+        duration: 3000,
+        easing: Easing.linear, // constant speed, no easing
+      }),
+      -1, // infinite
+      false, // don't reverse
+    );
+  }, []);
 
-  const strokeWidth = 16;
+  const StrokePaint = () => (
+    <Paint style="stroke" strokeWidth={18}>
+      <SweepGradient c={center} colors={[c1, c2, c1]} />
+      <BlurMask blur={10} style="outer" />
+    </Paint>
+  );
 
-  // Oval centered on screen
-  const ovalRect = rect(cx - ovalW / 2, cy - ovalH / 2, ovalW, ovalH);
-
-  // Gradient colors — cyan top to blue bottom
-  const gradientStart = vec(cx, cy - ovalH);
-  const gradientEnd = vec(cx, cy + ovalH);
-  const colors = ["#00CFFF", "#1A6EF5"];
   return (
     <Canvas style={styles.canvas}>
-      {/* Oval 1 — horizontal (0°) */}
-      <Oval
-        rect={ovalRect}
-        color="00CFFF"
-        style="stroke"
-        strokeWidth={strokeWidth}
-      />
-      {/* Oval 2 — rotated 60° */}
-      <Group transform={[{ rotate: Math.PI / 3 }]} origin={{ x: cx, y: cy }}>
-        <Oval
-          rect={ovalRect}
-          color="00CFFF"
-          style="stroke"
-          strokeWidth={strokeWidth}
+      {/* Center dot stays still */}
+      <Circle c={center} r={25}>
+        <RadialGradient
+          colors={[c1, c2]}
+          c={vec(center.x + 10, center.y - 10)}
+          r={30}
         />
-      </Group>
+        <BlurMask blur={10} style="inner" />
+      </Circle>
+      {/* Wrap everything in a rotating Group */}
+      <Group transform={rotateTransform} origin={center}>
+        <Oval rect={rct} color="transparent">
+          <StrokePaint />
+        </Oval>
 
-      {/* Oval 3 — rotated 120° */}
-      <Group
-        transform={[{ rotate: (2 * Math.PI) / 3 }]}
-        origin={{ x: cx, y: cy }}
-      >
-        <Oval
-          rect={ovalRect}
-          color={"lightblue"}
-          style="stroke"
-          strokeWidth={strokeWidth}
-        />
+        <Group
+          transform={[{ rotate: Math.PI / 3 }, { scale: -1 }]}
+          origin={center}
+        >
+          <Oval rect={rct} color="transparent">
+            <StrokePaint />
+          </Oval>
+        </Group>
+
+        <Group
+          transform={[{ rotate: -Math.PI / 3 }, { scale: -1 }]}
+          origin={center}
+        >
+          <Oval rect={rct} color="transparent">
+            <StrokePaint />
+          </Oval>
+        </Group>
       </Group>
-      {/* Center dot */}
     </Canvas>
   );
 };
 
-export default FirstScreen;
-
 const styles = StyleSheet.create({
-  canvas: {
-    flex: 1, // fills the screen
-    backgroundColor: "white",
-  },
+  canvas: { flex: 1, backgroundColor: "white" },
 });
+export default FirstScreen;
